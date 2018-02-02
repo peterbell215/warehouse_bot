@@ -22,7 +22,7 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
-  # Factory Girl configuration
+  # Factory Bot configuration
   config.include FactoryBot::Syntax::Methods
 
   config.before(:suite) do
