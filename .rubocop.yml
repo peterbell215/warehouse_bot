@@ -1,0 +1,40 @@
+require: rubocop-rspec
+
+Metrics/LineLength:
+  Max: 120
+
+Rails:
+  Enabled: true
+
+AllCops:
+  Include:
+    - '**/Rakefile'
+  Exclude:
+    - 'bin/**/*'
+    - 'db/**/*'
+    - 'config/**/*'
+    - 'script/**/*'
+  TargetRubyVersion: 2.4
+
+Style/RedundantSelf:
+  Enabled: false
+
+Style/SingleLineBlockParams:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Exclude:
+    - "spec/*/**/*_spec.rb"
+
+Metrics/BlockLength:
+  Exclude:
+    - "spec/*/**/*_spec.rb"
+
+RSpec/LetSetup:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Max: 3
+
+Metrics/BlockLength:
+  ExcludedMethods: ['describe', 'context', 'feature', 'define', 'shared_examples', 'factory']
