@@ -1,7 +1,11 @@
+# frozen_string_literal: true
+
 require 'warehouse_bot/create_or_update_record'
 require 'warehouse_bot/existing_record'
 
 module WarehouseBot
+  # Class used to represent a specific snapshot of the database after the yield from a WarehouseBot.warehouse_bot has
+  # returned.
   class DatabaseSnapshot
     # This holds a reference to the previous snapshot of the DB.  This captures the state of the DB before
     # this update.
@@ -17,9 +21,9 @@ module WarehouseBot
     # @param [DatabaseSnapshot] previous_snapshot last database snapshot
     def initialize(previous_snapshot)
       @previous_snapshot = previous_snapshot
-      @records = Hash.new { |hash, key| hash[key] = Array.new }
+      @records = Hash.new { |hash, key| hash[key] = [] }
 
-      tables = ActiveRecord::Base.connection.tables.to_a - [ 'ar_internal_metadata' ]
+      tables = ActiveRecord::Base.connection.tables.to_a - ['ar_internal_metadata']
       tables.each do |table|
         klass = table.classify.constantize
         klass.find_each { |record| create_or_update(klass, record) }
@@ -45,7 +49,7 @@ module WarehouseBot
           return true
         end
       end
-      return false
+      false
     end
   end
 end

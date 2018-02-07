@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'warehouse_bot/version'
 require 'warehouse_bot/invocation_history_point'
 require 'warehouse_bot/database_snapshot'
@@ -15,7 +17,6 @@ module WarehouseBot
       yield
       current_position.database_state = DatabaseSnapshot.new(pre_yield_db_state)
     end
-
   end
 
   # This is the top of the invocation tree.  As the RSpec tests run, we build up a history of how the warehouse_bot
@@ -34,7 +35,7 @@ module WarehouseBot
 
   # Should be called at the start of each test run.  Will reset current position to the top of the invocation tree
   # to allow us to track our way through the tree anew.
-  # 
+  #
   # @return [InvocationHistoryPoint] current position
   def self.reset_tree
     @@root ||= InvocationHistoryPoint.new(nil, nil)
@@ -43,7 +44,7 @@ module WarehouseBot
 
   def self.add_invocation_point(path, lineno)
     @@current_position =
-        @@current_position.descendants.find{ |invocation| invocation.path==path && invocation.lineno==lineno } ||
-            InvocationHistoryPoint.new(path, lineno).tap{ |new_point| @@current_position.descendants.push(new_point) }
+      @@current_position.descendants.find { |invocation| invocation.path == path && invocation.lineno == lineno } ||
+      InvocationHistoryPoint.new(path, lineno).tap { |new_point| @@current_position.descendants.push(new_point) }
   end
 end

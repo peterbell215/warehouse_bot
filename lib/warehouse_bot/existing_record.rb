@@ -1,5 +1,8 @@
-module WarehouseBot
+# frozen_string_literal: true
 
+module WarehouseBot
+  # Objects in this class are used to represent an object that exists in the snapshot but has not changed from
+  # a previous invocation.  It stores a reference to the original contract.
   class ExistingRecord
     attr_reader :original_record
 
@@ -7,8 +10,6 @@ module WarehouseBot
       @original_record = original_record
     end
 
-    def ==(active_record)
-      original_record==active_record
-    end
+    delegate :==, to: :original_record
   end
 end

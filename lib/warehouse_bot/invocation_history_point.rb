@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module WarehouseBot
   class InvocationHistoryPoint
     # @param [String] path filename with path from which warehouse_bot was invoked
