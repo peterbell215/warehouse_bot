@@ -2,6 +2,8 @@ require 'benchmark'
 require 'active_record'
 require 'active_model'
 require 'factory_bot'
+require 'faker'
+require 'database_cleaner'
 
 require 'bundler/setup'
 
@@ -27,5 +29,14 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     FactoryBot.find_definitions
+    DatabaseCleaner.strategy = :truncation
+  end
+
+  config.before(:each) do
+    DatabaseCleaner.start
+  end
+
+  config.after(:each) do
+    DatabaseCleaner.clean
   end
 end
