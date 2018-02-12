@@ -3,7 +3,7 @@
 RSpec.describe WarehouseBot::CreateOrUpdateRecord do
   subject { WarehouseBot::ExistingRecord.new(active_record) }
 
-  let(:original_record) { WarehouseBot::CreateOrUpdateRecord.new(active_record) }
+  let(:original_record) { described_class.new(active_record) }
   let(:active_record) { FactoryBot.create :random_author }
   let(:another_active_recort) { FactoryBot.create :random_author }
 

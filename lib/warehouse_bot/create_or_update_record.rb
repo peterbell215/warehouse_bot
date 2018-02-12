@@ -15,12 +15,12 @@ module WarehouseBot
 
     # Returns whether this is a new record.  Used by InnovationHistoyPoint to differentiate between records
     # that have been created or updated in this snapshot and those that were created in previous snapshots.
-    # 
+    #
     # @return [True]
     def new_record?
-      true  
+      true
     end
-    
+
     # The record's id within the database.
     attr_reader :id
 
@@ -30,7 +30,7 @@ module WarehouseBot
     # @param [ActiveRecord] other
     # @return [Bool]
     def ==(other)
-      @klass==other.class && @attributes == strip_active_record(other)
+      @klass == other.class && @attributes == strip_active_record(other)
     end
 
     # Used in testing to retrieve specific fields.

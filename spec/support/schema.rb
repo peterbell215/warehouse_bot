@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ActiveRecord::Schema.define do
   self.verbose = false
 
@@ -6,7 +8,7 @@ ActiveRecord::Schema.define do
 
     t.timestamps
   end
-  
+
   create_table :postings, force: true do |t|
     t.string :title, nil: false
     t.text :content, description: false
@@ -23,5 +25,4 @@ ActiveRecord::Schema.define do
 
     t.timestamp
   end
-
 end

@@ -26,7 +26,8 @@ RSpec.describe WarehouseBot::InvocationHistoryPoint do
 
   describe 'creating a series of snapshots' do
     subject(:second_snapshot) { WarehouseBot::DatabaseSnapshot.new(first_snapshot) }
-    let(:original_snapshot_authors ) { first_snapshot; Set.new(Author.all.map(&:name)) }
+
+    let(:original_snapshot_authors) { first_snapshot; Set.new(Author.all.map(&:name)) }
 
     before do
       original_snapshot_authors
@@ -35,16 +36,16 @@ RSpec.describe WarehouseBot::InvocationHistoryPoint do
       FactoryBot.create :posting, author_id: author.id
     end
 
-    specify { expect(second_snapshot.previous_snapshot).to eql(first_snapshot)}
+    specify { expect(second_snapshot.previous_snapshot).to eql(first_snapshot) }
     specify { expect(second_snapshot.records[Author].size).to eq(6) }
     specify 'that 2nd snapshot holds new author and one comment' do
-      second_snapshot.records[Author].any?{|record| record.new_record? && record['name']=='Snapshot 2 Author'}
+      second_snapshot.records[Author].any? { |record| record.new_record? && record['name'] == 'Snapshot 2 Author' }
     end
     specify 'that 2nd snapshot holds original authors' do
       original_authors = second_snapshot.records[Author].reduce(Set.new) do |set, record|
-         record.new_record? ? set : set << record['name']
+        record.new_record? ? set : set << record['name']
       end
-      expect( original_snapshot_authors ).to eq(original_authors)
+      expect(original_snapshot_authors).to eq(original_authors)
     end
   end
 end

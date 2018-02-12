@@ -1,5 +1,7 @@
 
 
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :comment, class: Comment do
     factory :random_comment do
@@ -7,6 +9,5 @@ FactoryBot.define do
       comment { Faker::Lorem.paragraph }
       author_id { Author.order('RANDOM()').first }
     end
-
   end
 end

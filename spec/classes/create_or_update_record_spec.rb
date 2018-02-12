@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 RSpec.describe WarehouseBot::CreateOrUpdateRecord do
-  subject { WarehouseBot::CreateOrUpdateRecord.new(active_record) }
+  subject { described_class.new(active_record) }
+
   let(:active_record) { FactoryBot.create :random_author }
   let(:another_active_recort) { FactoryBot.create :random_author }
 
@@ -16,7 +17,7 @@ RSpec.describe WarehouseBot::CreateOrUpdateRecord do
   end
 
   describe 'record updated on change' do
-    let(:new_record) { WarehouseBot::CreateOrUpdateRecord.new(active_record) }
+    let(:new_record) { described_class.new(active_record) }
 
     before do
       active_record.update!(name: 'changed name')

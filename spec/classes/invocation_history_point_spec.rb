@@ -22,7 +22,7 @@ RSpec.describe WarehouseBot::InvocationHistoryPoint do
     end
 
     it 'correctly records a linear history of invocation' do
-      check_tree(WarehouseBot.root, [ { l: 10, d: [ { l:20, d: [ { l:30, d: []}]}]}])
+      check_tree(WarehouseBot.root, [{ l: 10, d: [{ l: 20, d: [{ l: 30, d: [] }] }] }])
     end
 
     it 'correctly records two different paths of invocation' do
@@ -31,7 +31,7 @@ RSpec.describe WarehouseBot::InvocationHistoryPoint do
       WarehouseBot.add_invocation_point('file 1', 20)
       WarehouseBot.add_invocation_point('file 1', 40)
 
-      check_tree(WarehouseBot.root, [{ l: 10, d: [{ l:20, d: [{l: 30, d: []}, {l: 40, d: []}]}]}])
+      check_tree(WarehouseBot.root, [{ l: 10, d: [{ l: 20, d: [{ l: 30, d: [] }, { l: 40, d: [] }] }] }])
     end
 
     def check_tree(current, linenos)
@@ -42,7 +42,7 @@ RSpec.describe WarehouseBot::InvocationHistoryPoint do
     end
 
     def check_node(current, linenos)
-      current.lineno==linenos[:l] && check_tree(current, linenos[:d])
+      current.lineno == linenos[:l] && check_tree(current, linenos[:d])
     end
   end
 end

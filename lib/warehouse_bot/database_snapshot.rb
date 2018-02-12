@@ -32,7 +32,7 @@ module WarehouseBot
 
     # Writes the new or updated records within the current snapshot to the database.
     def push_to_db
-      records.values.flatten.keep_if{|r| r.new_record? }.each(&:write_to_db)
+      records.values.flatten.keep_if(&:new_record?).each(&:write_to_db)
     end
 
     # Given a table class and a record, check if the record previously existed.  If so, we simply store a reference
