@@ -8,14 +8,14 @@ module WarehouseBot
   def self.warehouse_bot
     called_from = caller_locations(1, 1)
 
-    pre_yield_db_state = current_position.database_state
+    pre_yield_db_state = current_position.database_snapshot
     add_invocation_point(called_from[0].path, called_from[0].lineno)
 
-    if current_position.database_state
-      current_position.database_state.push_to_db
+    if current_position.database_snapshot
+      current_position.database_snapshot.push_to_db
     else
       yield
-      current_position.database_state = DatabaseSnapshot.new(pre_yield_db_state)
+      current_position.database_snapshot = DatabaseSnapshot.new(pre_yield_db_state)
     end
   end
 

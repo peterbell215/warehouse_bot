@@ -12,5 +12,6 @@ module WarehouseBot
     end
 
     attr_reader :path, :lineno, :descendants
+    attr_accessor :database_snapshot
   end
 end
