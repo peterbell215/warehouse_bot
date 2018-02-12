@@ -14,4 +14,20 @@ RSpec.describe WarehouseBot::CreateOrUpdateRecord do
     subject.write_to_db
     expect(Author.find(subject.id)).not_to be_nil
   end
+
+  describe 'record updated on change' do
+    let(:new_record) { WarehouseBot::CreateOrUpdateRecord.new(active_record) }
+
+    before do
+      active_record.update!(name: 'changed name')
+      new_record
+      active_record.delete
+      subject.write_to_db
+    end
+
+    specify do
+      expect_any_instance_of(Author).to receive(:update_attributes).once
+      new_record.write_to_db
+    end
+  end
 end

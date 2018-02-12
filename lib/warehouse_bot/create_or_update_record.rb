@@ -43,8 +43,9 @@ module WarehouseBot
     #
     # @return [Void]
     def write_to_db
-      if @klass.find_by(id: id)
-        klass.update_attributes(@attributes)
+      existing_record = @klass.find_by(id: id)
+      if existing_record
+        existing_record.update_attributes(@attributes)
       else
         new_record = @klass.new(@attributes)
         new_record.id = self.id
