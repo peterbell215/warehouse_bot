@@ -22,7 +22,7 @@ RSpec.describe WarehouseBot::InvocationHistoryPoint do
     end
 
     it 'correctly records a linear history of invocation' do
-      check_current(WarehouseBot.root, [10, 20, 30])
+      check_tree(WarehouseBot.root, [ { l: 10, d: [ { l:20, d: [ { l:30, d: []}]}]}])
     end
 
     it 'correctly records two different paths of invocation' do
@@ -31,31 +31,18 @@ RSpec.describe WarehouseBot::InvocationHistoryPoint do
       WarehouseBot.add_invocation_point('file 1', 20)
       WarehouseBot.add_invocation_point('file 1', 40)
 
-      check_current(WarehouseBot.root, [10, 20, [30, 40]])
+      check_tree(WarehouseBot.root, [{ l: 10, d: [{ l:20, d: [{l: 30, d: []}, {l: 40, d: []}]}]}])
     end
 
-    def check_current(current, linenos)
-      if linenos.first.is_a?(Array)
-        check_current_array(current, linenos)
-      else
-        check_current_line(current, linenos)
+    def check_tree(current, linenos)
+      current.descendants.each_with_index do |descendant, i|
+        return false unless check_node(descendant, linenos[i])
       end
+      true
     end
 
-    def check_current_array(current, linenos)
-      linenos.first.each_with_index do |lineno, index|
-        expect(current.descendants[index].path).to eq('file 1')
-        expect(current.descendants[index].lineno).to eq(lineno)
-        check_current(current.descendants[lineno], linenos.drop(1))
-      end
-    end
-
-    def check_current_line(current, linenos)
-      lineno = linenos.shift
-      expect(current.descendants.size).to eq(1)
-      expect(current.descendants[0].path).to eq('file 1')
-      expect(current.descendants[0].lineno).to eq(lineno)
-      check_current(current.descendants[0], linenos) unless linenos.empty?
+    def check_node(current, linenos)
+      current.lineno==linenos[:l] && check_tree(current, linenos[:d])
     end
   end
 end

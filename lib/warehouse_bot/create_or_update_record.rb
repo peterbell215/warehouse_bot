@@ -13,6 +13,14 @@ module WarehouseBot
       @attributes = strip_active_record(active_record)
     end
 
+    # Returns whether this is a new record.  Used by InnovationHistoyPoint to differentiate between records
+    # that have been created or updated in this snapshot and those that were created in previous snapshots.
+    # 
+    # @return [True]
+    def new_record?
+      true  
+    end
+    
     # The record's id within the database.
     attr_reader :id
 
@@ -22,7 +30,7 @@ module WarehouseBot
     # @param [ActiveRecord] other
     # @return [Bool]
     def ==(other)
-      @active_record.class == @klass && @attributes == strip_active_record(other)
+      @klass==other.class && @attributes == strip_active_record(other)
     end
 
     # Used in testing to retrieve specific fields.
@@ -35,11 +43,10 @@ module WarehouseBot
     #
     # @return [Void]
     def write_to_db
-      existing_record = klass.find(id)
-      if existing_record
+      if @klass.find_by(id: id)
         klass.update_attributes(@attributes)
       else
-        new_record = klass.new(@attributes)
+        new_record = @klass.new(@attributes)
         new_record.id = self.id
         new_record.save(validations: false)
       end

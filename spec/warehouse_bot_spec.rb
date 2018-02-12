@@ -2,9 +2,7 @@
 
 RSpec.describe WarehouseBot do
   before do
-    described_class.warehouse_bot do
-      FactoryBot.create(:author)
-    end
+    FactoryBot.create(:author)
   end
 
   it 'has a version number' do

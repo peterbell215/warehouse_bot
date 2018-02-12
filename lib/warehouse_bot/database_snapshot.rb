@@ -44,7 +44,7 @@ module WarehouseBot
     # Used by create_or_update to see if the record already exists in the previous snapshot.
     private def find_in_previous_snapshot(klass, record)
       previous_snapshot.records[klass].each do |historic_record|
-        if record == historic_record
+        if historic_record == record
           records[klass].push ExistingRecord.new(historic_record)
           return true
         end

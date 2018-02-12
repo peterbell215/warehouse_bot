@@ -10,6 +10,11 @@ module WarehouseBot
       @original_record = original_record
     end
 
-    delegate :==, to: :original_record
+    # (see CreateOrUpdateRecord#new_record?)
+    def new_record?
+      false
+    end
+
+    delegate :==, :[], to: :original_record
   end
 end
