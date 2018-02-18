@@ -2,6 +2,10 @@
 
 # These classes provide a very simple database for testing purposes.
 
+class ApplicationRecord < ActiveRecord::Base
+  self.abstract_class = true
+end
+
 # Record to hold an author.  Each author can create a number of postings.  They can also comment on other author's
 # posting.
 class Author < ApplicationRecord

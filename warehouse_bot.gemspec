@@ -35,6 +35,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'activerecord', '~> 5.1'
   spec.add_dependency 'activesupport', '~> 5.1'
+  spec.add_dependency 'factory_bot', '~> 4.8'
 
   spec.add_development_dependency 'bundler', '~> 1.16'
   spec.add_development_dependency 'rake', '~> 10.0'
@@ -42,8 +43,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop-rspec'
   spec.add_development_dependency 'faker'
   spec.add_development_dependency 'database_cleaner'
-
-  spec.add_development_dependency 'factory_bot', '~> 4.8'
   spec.add_development_dependency 'sqlite3'
   spec.add_development_dependency 'yard'
 end

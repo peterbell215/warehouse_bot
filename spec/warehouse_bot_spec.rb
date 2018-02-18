@@ -11,7 +11,7 @@ RSpec.describe WarehouseBot do
     before do
       WarehouseBot.reset_tree
 
-      WarehouseBot.warehouse_bot do
+      WarehouseBot.db_setup do
         5.times do
           author = FactoryBot.create :random_author
           FactoryBot.create_list :posting, Random.rand(5), author_id: author.id
@@ -27,7 +27,7 @@ RSpec.describe WarehouseBot do
 
     describe 'testing normal usage - level 2' do
       before do
-        WarehouseBot.warehouse_bot do
+        WarehouseBot.db_setup do
           @block_expected = true
 
           author = FactoryBot.create :author, name: 'Snapshot 2 Author'
@@ -46,4 +46,20 @@ RSpec.describe WarehouseBot do
       end
     end
   end
+
+  describe 'in combination with FactoryBot and let' do
+    let(:test_let) { @let_called = true; WarehouseBot.find_or_create :author }
+
+    specify { expect(test_let.name).to eq('Test User') }
+
+    describe 'in combination with FactoryBot and let - level 2' do
+      let(:test_let_2) { author = WarehouseBot.find_or_create :author, name: 'Snapshot 2 Author' }
+
+      specify { expect(@let_called). to be_nil }
+      specify { expect(test_let.name).to eq('Test User') }
+      specify { expect(test_let_2.name).to eq('Snapshot 2 Author') }
+    end
+
+  end
+
 end
