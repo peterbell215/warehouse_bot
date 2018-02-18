@@ -23,9 +23,7 @@ module WarehouseBot
       @previous_snapshot = previous_snapshot
       @records = Hash.new { |hash, key| hash[key] = [] }
 
-      tables = ActiveRecord::Base.connection.tables.to_a - ['ar_internal_metadata']
-      tables.each do |table|
-        klass = table.classify.constantize
+      ApplicationRecord.descendants.each do |klass|
         klass.find_each { |record| create_or_update(klass, record) }
       end
     end

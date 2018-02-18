@@ -18,8 +18,10 @@ class Posting < ApplicationRecord
   belongs_to :author
 end
 
-# A comment on a posting.
-class Comment < ApplicationRecord
-  belongs_to :author
-  belongs_to :posting
+module Comments
+  # A comment on a posting.
+  class Comment < ApplicationRecord
+    belongs_to :author
+    belongs_to :posting
+  end
 end
