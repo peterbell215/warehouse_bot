@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'activerecord-import'
+
 require 'warehouse_bot/version'
 require 'warehouse_bot/invocation_history_point'
 require 'warehouse_bot/database_snapshot'

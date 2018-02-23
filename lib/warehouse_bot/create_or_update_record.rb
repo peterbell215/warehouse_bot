@@ -8,11 +8,10 @@ module WarehouseBot
     #
     # @param [ActiveRecord] active_record
     # @param [Bool] update - update to an existing record?
-    def initialize(active_record, update)
+    def initialize(active_record)
       @id = active_record.id
       @klass = active_record.class
       @attributes = strip_active_record(active_record)
-      @update = update
     end
 
     # Returns whether this is a new record.  Used by InnovationHistoyPoint to differentiate between records
@@ -28,9 +27,6 @@ module WarehouseBot
 
     # The attributes of this record.
     attr_reader :attributes
-
-    # records whether this record is an update or a new record
-    attr_reader :update
 
     # Compares the current CreateOrUpdateRecord with an active record.  Returns true if all attributes including
     # id and any foreign keys are the same, but excluding created_at and updated_at.

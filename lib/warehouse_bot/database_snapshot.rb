@@ -27,7 +27,7 @@ module WarehouseBot
         if previous_snapshot
           klass.find_each { |record| create_or_update(klass, record) }
         else
-          klass.find_each { |record| create(klass, record) }
+          klass.find_each { |record| push(klass, record) }
         end
       end
     end
@@ -45,10 +45,10 @@ module WarehouseBot
         if historic_record == record
           return no_change(klass, historic_record)
         elsif historic_record.id==record.id
-          return update(klass, record)
+          return push(klass, record)
         end
       end
-      create(klass, record)
+      push(klass, record)
     end
 
     # Called when the record is genuinely new.
@@ -56,17 +56,8 @@ module WarehouseBot
     # @api private
     # @param [Class] klass
     # @param [ActiveRecord] record
-    private def create(klass, record)
-      @records[klass].push CreateOrUpdateRecord.new(record, false)
-    end
-
-    # Called when the record is genuinely new.
-    #
-    # @api private
-    # @param [Class] klass
-    # @param [ActiveRecord] record
-    private def update(klass, record)
-      @records[klass].push CreateOrUpdateRecord.new(record, true)
+    private def push(klass, record)
+      @records[klass].push CreateOrUpdateRecord.new(record)
     end
 
     # Called when the record is genuinely new.
@@ -93,12 +84,8 @@ module WarehouseBot
       recs = records[klass].dup.keep_if(&:new_record?)
       return if recs.empty?
 
-      if ActiveRecord::Base.supports_on_duplicate_key_update?
-        klass.import recs.dup.map(&:attributes), validate: false, on_duplicate_key_update: true
-      else
-        recs.dup.keep_if(&:update).each {|record| klass.find(record.id).update_columns(record.attributes)}
-        klass.import recs.dup.delete_if(&:update).map(&:attributes), validate: false
-      end
+      recs.delete_if{ |record| klass.find_by(id: record.id)&.update_columns(record.attributes) }
+      klass.import recs.map(&:attributes), validate: false
     end
   end
 end

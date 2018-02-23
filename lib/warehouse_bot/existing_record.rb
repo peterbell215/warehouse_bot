@@ -15,6 +15,6 @@ module WarehouseBot
       false
     end
 
-    delegate :==, :[], to: :original_record
+    delegate :==, :[], :id, to: :original_record
   end
 end
