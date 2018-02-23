@@ -7,10 +7,12 @@ module WarehouseBot
     # Create a new CreateOrUpdateRecord from an active record in the database.
     #
     # @param [ActiveRecord] active_record
-    def initialize(active_record)
+    # @param [Bool] update - update to an existing record?
+    def initialize(active_record, update)
       @id = active_record.id
       @klass = active_record.class
       @attributes = strip_active_record(active_record)
+      @update = update
     end
 
     # Returns whether this is a new record.  Used by InnovationHistoyPoint to differentiate between records
@@ -24,6 +26,12 @@ module WarehouseBot
     # The record's id within the database.
     attr_reader :id
 
+    # The attributes of this record.
+    attr_reader :attributes
+
+    # records whether this record is an update or a new record
+    attr_reader :update
+
     # Compares the current CreateOrUpdateRecord with an active record.  Returns true if all attributes including
     # id and any foreign keys are the same, but excluding created_at and updated_at.
     #
@@ -33,28 +41,13 @@ module WarehouseBot
       @klass == other.class && @attributes == strip_active_record(other)
     end
 
+    private def strip_active_record(record)
+      record.attributes.except!(:created_at, :updated_at)
+    end
+
     # Used in testing to retrieve specific fields.
     def [](field)
       @attributes[field]
-    end
-
-    # Writes to the database.  If the record already exists, simply updates it.  If the record does not exist, creates
-    # it with the correct id.
-    #
-    # @return [Void]
-    def write_to_db
-      existing_record = @klass.find_by(id: id)
-      if existing_record
-        existing_record.update_attributes(@attributes)
-      else
-        new_record = @klass.new(@attributes)
-        new_record.id = self.id
-        new_record.save(validations: false)
-      end
-    end
-
-    private def strip_active_record(record)
-      record.attributes.except!(:created_at, :updated_at)
     end
   end
 end

@@ -1,5 +1,6 @@
 require 'benchmark'
 require 'active_record'
+require 'activerecord-import'
 require 'active_model'
 require 'factory_bot'
 require 'faker'

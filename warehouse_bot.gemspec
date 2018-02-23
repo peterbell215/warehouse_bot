@@ -35,6 +35,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'activerecord', '~> 5.1'
   spec.add_dependency 'activesupport', '~> 5.1'
+  spec.add_dependency 'activerecord-import'
   spec.add_dependency 'factory_bot', '~> 4.8'
 
   spec.add_development_dependency 'bundler', '~> 1.16'
