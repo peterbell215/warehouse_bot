@@ -16,9 +16,9 @@ RSpec.describe WarehouseBot::InvocationHistoryPoint do
 
   describe 'creates a tree' do
     before do
-      WarehouseBot.add_invocation_point('file 1', 10)
-      WarehouseBot.add_invocation_point('file 1', 20)
-      WarehouseBot.add_invocation_point('file 1', 30)
+      WarehouseBot.update_current_position_from_invocation('file 1', 10)
+      WarehouseBot.update_current_position_from_invocation('file 1', 20)
+      WarehouseBot.update_current_position_from_invocation('file 1', 30)
     end
 
     it 'correctly records a linear history of invocation' do
@@ -27,9 +27,9 @@ RSpec.describe WarehouseBot::InvocationHistoryPoint do
 
     it 'correctly records two different paths of invocation' do
       WarehouseBot.reset_tree
-      WarehouseBot.add_invocation_point('file 1', 10)
-      WarehouseBot.add_invocation_point('file 1', 20)
-      WarehouseBot.add_invocation_point('file 1', 40)
+      WarehouseBot.update_current_position_from_invocation('file 1', 10)
+      WarehouseBot.update_current_position_from_invocation('file 1', 20)
+      WarehouseBot.update_current_position_from_invocation('file 1', 40)
 
       check_tree(WarehouseBot.root, [{ l: 10, d: [{ l: 20, d: [{ l: 30, d: [] }, { l: 40, d: [] }] }] }])
     end

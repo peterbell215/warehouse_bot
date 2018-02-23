@@ -10,7 +10,7 @@ module WarehouseBot
     called_from ||= caller_locations(1, 1)
 
     pre_yield_db_state = current_position.database_snapshot
-    add_invocation_point(called_from[0].path, called_from[0].lineno)
+    update_current_position_from_invocation(called_from[0].path, called_from[0].lineno)
 
     if current_position.database_snapshot
       current_position.database_snapshot.push_to_db
@@ -57,7 +57,7 @@ module WarehouseBot
 
   # Invocation points are the structure that records the tree like way that RSpec tests are built up.  An invocation
   # point is a specific file and line number.
-  def self.add_invocation_point(path, lineno)
+  def self.update_current_position_from_invocation(path, lineno)
     @@current_position =
       @@current_position.descendants.find { |invocation| invocation.path == path && invocation.lineno == lineno } ||
       InvocationHistoryPoint.new(path, lineno).tap { |new_point| @@current_position.descendants.push(new_point) }
