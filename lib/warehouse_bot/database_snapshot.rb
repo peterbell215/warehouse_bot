@@ -23,13 +23,45 @@ module WarehouseBot
       @previous_snapshot = previous_snapshot
       @records = Hash.new { |hash, key| hash[key] = [] }
 
-      ApplicationRecord.descendants.each do |klass|
+      ordered_table_list.each do |klass|
         if previous_snapshot
           klass.find_each { |record| create_or_update(klass, record) }
         else
           klass.find_each { |record| push(klass, record) }
         end
       end
+    end
+
+
+    private def ordered_table_list
+      return @ordered_table_list if @ordered_table_list
+
+      @ordered_table_list = ApplicationRecord.descendants.keep_if{ |klass| DatabaseSnapshot.relevant?(klass) }
+      i = 0
+      while i < @ordered_table_list.count-1
+        klass1 = @ordered_table_list[i]
+        j = i + 1
+        while j < @ordered_table_list.count
+          klass2 = @ordered_table_list[j]
+          if klass1.reflect_on_all_associations(:belongs_to).map(&:klass).include?(klass2)
+            @ordered_table_list.delete_at(j)
+            @ordered_table_list.insert(i, klass2)
+            klass1 = klass2
+            j = i + 1
+          else
+            j += 1
+          end
+        end
+        i += 1
+      end
+      @ordered_table_list
+    end
+
+
+    # @param [Object] klass
+    def self.relevant?(klass)
+      !klass.count.zero? &&
+          !klass.all.to_a.map(&:class).uniq.delete_if{|record_klass| klass!=record_klass}.empty?
     end
 
     # Given a table class and a record, check if the record previously existed.  If so, we simply store a reference

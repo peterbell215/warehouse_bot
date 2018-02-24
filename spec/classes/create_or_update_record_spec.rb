@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe WarehouseBot::CreateOrUpdateRecord do
-  subject { described_class.new(active_record, true) }
+  subject { described_class.new(active_record) }
 
   let(:active_record) { FactoryBot.create :random_author }
   let(:another_active_recort) { FactoryBot.create :random_author }
