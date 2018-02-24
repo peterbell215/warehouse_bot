@@ -32,13 +32,15 @@ module WarehouseBot
       end
     end
 
-
+    # Creates the ordered list of tables so that no records are written to the database before the parent records
+    # have been written.
+    # @return [Void]
     private def ordered_table_list
       return @ordered_table_list if @ordered_table_list
 
-      @ordered_table_list = ApplicationRecord.descendants.keep_if{ |klass| DatabaseSnapshot.relevant?(klass) }
+      @ordered_table_list = ApplicationRecord.descendants.keep_if { |klass| DatabaseSnapshot.relevant?(klass) }
       i = 0
-      while i < @ordered_table_list.count-1
+      while i < @ordered_table_list.count - 1
         klass1 = @ordered_table_list[i]
         j = i + 1
         while j < @ordered_table_list.count
@@ -57,11 +59,10 @@ module WarehouseBot
       @ordered_table_list
     end
 
-
     # @param [Object] klass
     def self.relevant?(klass)
       !klass.count.zero? &&
-          !klass.all.to_a.map(&:class).uniq.delete_if{|record_klass| klass!=record_klass}.empty?
+        !klass.all.to_a.map(&:class).uniq.delete_if { |record_klass| klass != record_klass }.empty?
     end
 
     # Given a table class and a record, check if the record previously existed.  If so, we simply store a reference
@@ -76,7 +77,7 @@ module WarehouseBot
       previous_snapshot.records[klass].each do |historic_record|
         if historic_record == record
           return no_change(klass, historic_record)
-        elsif historic_record.id==record.id
+        elsif historic_record.id == record.id
           return push(klass, record)
         end
       end
@@ -105,7 +106,7 @@ module WarehouseBot
     #
     # @return [Void]
     def push_to_db
-      records.keys.each { |klass| write_class(klass) }
+      records.each_key { |klass| write_class(klass) }
     end
 
     # Write new records for a specific.
@@ -116,7 +117,7 @@ module WarehouseBot
       recs = records[klass].dup.keep_if(&:new_record?)
       return if recs.empty?
 
-      recs.delete_if{ |record| klass.find_by(id: record.id)&.update_columns(record.attributes) }
+      recs.delete_if { |record| klass.find_by(id: record.id)&.update_columns(record.attributes) }
       klass.import recs.map(&:attributes), validate: false
     end
   end
