@@ -56,6 +56,7 @@ module WarehouseBot
             @ordered_table_list.delete_at(j)
             @ordered_table_list.insert(i, klass2)
             klass1 = klass2
+            klass1_belong_to = klass1.reflect_on_all_associations(:belongs_to).map(&:klass)
             j = i + 1
           else
             j += 1
