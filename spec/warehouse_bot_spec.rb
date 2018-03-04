@@ -94,10 +94,26 @@ RSpec.describe WarehouseBot do
     end
   end
 
+  describe 'using a joing table' do
+    before(:all) { WarehouseBot.clear_tree }
+
+    specify 'first time HABTM table entries created' do
+      create_db_content
+      expect(Posting.first.categories).not_to be_empty
+    end
+
+    specify 'second time HABTM table entries reloaded' do
+      create_db_content
+      expect(Posting.first.categories).not_to be_empty
+    end
+  end
+
   def create_db_content
     WarehouseBot.reset_tree
 
     WarehouseBot.db_setup do
+      FactoryBot.create_list :category, 5
+
       5.times do
         author = FactoryBot.create :random_author
         FactoryBot.create_list :posting, Random.rand(5), author_id: author.id

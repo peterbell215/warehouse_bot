@@ -28,5 +28,11 @@ ActiveRecord::Schema.define do
     t.timestamp
   end
 
+  create_table :categories, force: true do |t|
+    t.string :name
+  end
+
+  create_join_table :postings, :categories
+
   add_foreign_key :posts, :authors
 end

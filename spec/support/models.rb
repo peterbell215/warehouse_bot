@@ -16,6 +16,7 @@ end
 # Record to hold a posting.
 class Posting < ApplicationRecord
   belongs_to :author
+  has_and_belongs_to_many :categories
 end
 
 module Comments
@@ -24,4 +25,8 @@ module Comments
     belongs_to :author
     belongs_to :posting
   end
+end
+
+class Category < ApplicationRecord
+  has_and_belongs_to_many :postings
 end

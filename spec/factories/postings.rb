@@ -6,5 +6,7 @@ FactoryBot.define do
       title { Faker::StarWars.quote }
       description { Faker::Lorem.paragraph }
     end
+
+    categories { Category.all.sample(rand(1..3)) }
   end
 end
