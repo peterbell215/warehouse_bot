@@ -7,17 +7,30 @@ require 'warehouse_bot/invocation_history_point'
 require 'warehouse_bot/database_snapshot'
 
 module WarehouseBot
-  # Called to create some background data.
-  def self.db_setup(called_from = nil)
-    called_from ||= caller_locations(1, 1)
+  # Called to create some background data.  The actual data is created in the yield block.  Note, it is possible
+  # for the block to be invoked recursively if the RSpec tests are using let in conjunction with
+  # WarehouseBot.find_or_create.  We check whether its already been invoked and simply yield.  Otherwise, we
+  # hand over to the internal _capture_db_setup to do the hard work.
+  def self.db_setup(called_from = nil, &block)
+    unless @already_invoked
+      @already_invoked = true
+      result = WarehouseBot._capture_db_setup(called_from || caller_locations(1, 1), &block)
+      @already_invoked = nil
+      result
+    else
+      block.call
+    end
+  end
 
+  # @api private
+  def self._capture_db_setup(called_from ,&block)
     pre_yield_db_state = current_position.database_snapshot
     update_current_position_from_invocation(called_from[0].path, called_from[0].lineno)
 
     if current_position.database_snapshot
       current_position.database_snapshot.push_to_db
     else
-      current_position.result = yield
+      current_position.result = block.call
       current_position.database_snapshot = DatabaseSnapshot.new(pre_yield_db_state)
     end
     current_position.result
@@ -31,6 +44,22 @@ module WarehouseBot
   def self.find_or_create(name, *traits_and_overrides, &block)
     self.db_setup(caller_locations(1, 1)) do
       FactoryBot.create name, *traits_and_overrides, &block
+    end
+  end
+
+  # Print the current tree out in a way that is useful to a developer
+  #
+  # @param [Array<InvocationHistoryPoint>|nil] position_in_tree
+  def self.print(position_in_tree = nil)
+    if position_in_tree.nil?
+      @@root.descendants.each { |child| WarehouseBot.print( [child] ) }
+    elsif position_in_tree.last.descendants.empty?
+      puts position_in_tree.map(&:path).join('->')
+    else
+      position_in_tree.last.descendants.each do |d|
+        WarehouseBot.print(position_in_tree.push(d))
+        position_in_tree.pop
+      end
     end
   end
 

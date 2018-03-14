@@ -12,6 +12,10 @@ module WarehouseBot
       @descendants = []
     end
 
+    def inspect
+      "#{path.delete_prefix(Dir.pwd)}:#{lineno}\n#{database_snapshot ? database_snapshot.inspect : 'no db snapshot'}\nresult: #{result}"
+    end
+
     attr_reader :path, :lineno, :descendants
     attr_accessor :database_snapshot
 

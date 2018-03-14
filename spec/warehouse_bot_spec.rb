@@ -94,6 +94,30 @@ RSpec.describe WarehouseBot do
     end
   end
 
+  describe 'nested invocations of db_setup' do
+    before(:all) { WarehouseBot.clear_tree }
+
+    before(:each) do
+      WarehouseBot.reset_tree
+
+      WarehouseBot.db_setup do
+        @db_setup_run = true
+        author
+      end
+    end
+    let(:author) { WarehouseBot.db_setup { FactoryBot.create :author } }
+
+    specify 'first time author record created' do
+      expect(@db_setup_run).to be_truthy
+      expect(Author.count).to eq(1)
+    end
+
+    specify 'second time author record is created from db_snapshot' do
+      expect(@db_setup_run).to be_falsey
+      expect( Author.count ).to eq(1)
+    end
+  end
+
   describe 'using a joing table' do
     before(:all) { WarehouseBot.clear_tree }
 
@@ -105,6 +129,25 @@ RSpec.describe WarehouseBot do
     specify 'second time HABTM table entries reloaded' do
       create_db_content
       expect(Posting.first.categories).not_to be_empty
+    end
+  end
+
+  describe '#print' do
+    before(:all) { WarehouseBot.clear_tree }
+
+    before(:each) { create_db_content }
+
+    describe 'testing normal usage - level 2' do
+      before do
+        WarehouseBot.db_setup do
+          author = FactoryBot.create :author, name: 'Snapshot 2 Author'
+          FactoryBot.create :posting, author_id: author.id
+        end
+      end
+
+      specify do
+        WarehouseBot.print
+      end
     end
   end
 

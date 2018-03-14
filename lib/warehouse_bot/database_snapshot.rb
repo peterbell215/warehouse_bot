@@ -133,6 +133,21 @@ module WarehouseBot
       @records[klass].push ExistingRecord.new(historic_record)
     end
 
+    def inspect
+      result = ''
+      records.each_pair {|klass, records_of_klass| result += "<#{klass}: [#{primary_keys(records_of_klass)}]>\n" }
+      "[\n#{result}]"
+    end
+
+    def primary_keys(array)
+      array = array.map(&:id)
+      elipses = array.map.with_index{ |val, ind| array.slice(ind, 3)==(val..val+2).to_a }
+
+      array = array[0..0] + array[1..-1].map.with_index{ |val, ind| elipses[ind] ? '..'  : "#{val}" }
+      array = array.delete_if.with_index{ |val, ind| val=='..' && array[ind+1]=='..'}
+      array[0..-2].map.with_index{ |val, ind| array[ind]!='..' && array[ind+1]!='..' ? "#{val}, " : "#{val}" }.join + array[-1].to_s
+    end
+
     # Given a set of record, write them at speed to the database.
     #
     # @return [Void]

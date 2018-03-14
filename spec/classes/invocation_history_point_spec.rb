@@ -34,6 +34,10 @@ RSpec.describe WarehouseBot::InvocationHistoryPoint do
       check_tree(WarehouseBot.root, [{ l: 10, d: [{ l: 20, d: [{ l: 30, d: [] }, { l: 40, d: [] }] }] }])
     end
 
+    it 'can be inspected' do
+      expect(WarehouseBot.current_position.inspect).to eq("file 1:30\nno db snapshot\nresult: ")
+    end
+
     def check_tree(current, linenos)
       current.descendants.each_with_index do |descendant, i|
         return false unless check_node(descendant, linenos[i])
