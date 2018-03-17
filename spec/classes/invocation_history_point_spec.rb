@@ -16,9 +16,9 @@ RSpec.describe WarehouseBot::InvocationHistoryPoint do
 
   describe 'creates a tree' do
     before do
-      WarehouseBot.update_current_position_from_invocation('file 1', 10)
-      WarehouseBot.update_current_position_from_invocation('file 1', 20)
-      WarehouseBot.update_current_position_from_invocation('file 1', 30)
+      WarehouseBot._update_current_position_from_invocation('file 1', 10)
+      WarehouseBot._update_current_position_from_invocation('file 1', 20)
+      WarehouseBot._update_current_position_from_invocation('file 1', 30)
     end
 
     it 'correctly records a linear history of invocation' do
@@ -27,15 +27,16 @@ RSpec.describe WarehouseBot::InvocationHistoryPoint do
 
     it 'correctly records two different paths of invocation' do
       WarehouseBot.reset_tree
-      WarehouseBot.update_current_position_from_invocation('file 1', 10)
-      WarehouseBot.update_current_position_from_invocation('file 1', 20)
-      WarehouseBot.update_current_position_from_invocation('file 1', 40)
+      WarehouseBot._update_current_position_from_invocation('file 1', 10)
+      WarehouseBot._update_current_position_from_invocation('file 1', 20)
+      WarehouseBot._update_current_position_from_invocation('file 1', 40)
 
       check_tree(WarehouseBot.root, [{ l: 10, d: [{ l: 20, d: [{ l: 30, d: [] }, { l: 40, d: [] }] }] }])
     end
 
     it 'can be inspected' do
-      expect(WarehouseBot.current_position.inspect).to eq("file 1:30\nno db snapshot\nresult: ")
+      allow_any_instance_of(WarehouseBot::InvocationHistoryPoint).to receive(:_relative_path).and_return('file 1')
+      expect(WarehouseBot.current_position.inspect).to eq("file 1:30->file 1:20->file 1:10->file 1:->\n\nresult: ")
     end
 
     def check_tree(current, linenos)
