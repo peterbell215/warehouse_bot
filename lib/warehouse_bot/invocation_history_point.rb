@@ -12,6 +12,7 @@ module WarehouseBot
       @lineno = lineno
       @parent = parent
 
+      @nested_invocations = {}
       @descendants = []
     end
 
@@ -41,7 +42,7 @@ module WarehouseBot
       database_snapshot ? database_snapshot.inspect : 'no db snapshot'
     end
 
-    attr_reader :path, :lineno, :parent, :descendants
+    attr_reader :path, :lineno, :parent, :descendants, :nested_invocations
     attr_accessor :database_snapshot
 
     attr_accessor :result

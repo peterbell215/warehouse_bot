@@ -69,6 +69,7 @@ RSpec.describe WarehouseBot do
 
   describe 'in combination with FactoryBot and let' do
     before(:all) { WarehouseBot.clear_tree }
+    before(:each) { WarehouseBot.reset_tree }
 
     let(:test_let) { @let_called = true; WarehouseBot.find_or_create :author }
 
@@ -96,29 +97,40 @@ RSpec.describe WarehouseBot do
 
   describe 'nested invocations of db_setup' do
     before(:all) { WarehouseBot.clear_tree }
+    before(:each) { WarehouseBot.reset_tree }
 
-    before(:each) do
-      WarehouseBot.reset_tree
+    let(:author) { WarehouseBot.find_or_create :author, name: 'Test Author' }
 
-      WarehouseBot.db_setup do
-        @db_setup_run = true
-        author
+    describe 'author called from within the WarehouseBot::db_setup' do
+      before(:each) do
+        WarehouseBot.db_setup do
+          @db_setup_run = true
+          FactoryBot.create_list :category, 5
+          5.times { FactoryBot.create_list :posting, Random.rand(5), author_id: author.id }
+          Posting.all.find_each { |posting| FactoryBot.create_list :random_comment, Random.rand(5), posting_id: posting.id }
+        end
+      end
+
+      it 'creates the records the first' do
+        expect(@db_setup_run).to be_truthy
+        expect(author.name).to eq('Test Author')
+        expect(Author.find(author.id).name).to eq('Test Author')
+      end
+
+      it 'uses the previously saved records the second time' do
+        expect(@db_setup_run).to be_falsey
+        expect(author.name).to eq('Test Author')
+        expect(Author.find(author.id).name).to eq('Test Author')
       end
     end
-    let(:author) { WarehouseBot.db_setup { FactoryBot.create :author } }
 
-    specify 'first time author record created' do
-      expect(@db_setup_run).to be_truthy
-      expect(Author.count).to eq(1)
-    end
-
-    specify 'second time author record is created from db_snapshot' do
-      expect(@db_setup_run).to be_falsey
-      expect( Author.count ).to eq(1)
+    describe 'author called separately' do
+      specify { expect(author.name).to eq('Test Author') }
+      specify { expect(author.id).to eq(Author.find_by(name: 'Test Author').id) }
     end
   end
 
-  describe 'using a joing table' do
+  describe 'using a join table' do
     before(:all) { WarehouseBot.clear_tree }
 
     specify 'first time HABTM table entries created' do

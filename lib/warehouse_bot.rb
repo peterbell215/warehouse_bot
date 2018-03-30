@@ -21,30 +21,40 @@ module WarehouseBot
   # WarehouseBot.find_or_create.  We check whether its already been invoked and simply yield.  Otherwise, we
   # hand over to the internal _capture_db_setup to do the hard work.
   def self.db_setup(called_from = nil, &block)
-    if !@already_invoked
-      @already_invoked = true
-      result = WarehouseBot._capture_db_setup(called_from || caller_locations(1, 1), &block)
-      @already_invoked = nil
-      result
+    called_from ||= caller_locations(1, 1)
+    if @already_invoked.nil?
+      _top_level_invocation(called_from, &block)
     else
-      block.call
+      _nested_invocation(called_from, &block)
     end
   end
 
   # @api private
-  def self._capture_db_setup(called_from ,&block)
-    pre_yield_db_state = current_position.database_snapshot
-    _update_current_position_from_invocation(called_from[0].path, called_from[0].lineno, )
+  def self._top_level_invocation(called_from, &block)
+    @already_invoked = true
+    _update_current_position_from_invocation(called_from[0].path, called_from[0].lineno)
 
     if current_position.database_snapshot
       current_position.database_snapshot.push_to_db
     else
+      pre_yield_db_state = current_position.database_snapshot
       current_position.result = block.call
       current_position.database_snapshot = DatabaseSnapshot.new(pre_yield_db_state)
     end
+
+    @already_invoked = nil
     current_position.result
   end
 
+  # @api private
+  def self._nested_invocation(called_from, &block)
+    previous_invocation = current_position.nested_invocations[called_from.first.to_s]
+    if previous_invocation.nil?
+      current_position.nested_invocations[called_from.first.to_s] = block.call
+    else
+      previous_invocation
+    end
+  end
 
   # Invocation points are the structure that records the tree like way that RSpec tests are built up.  An invocation
   # point is a specific file and line number.
